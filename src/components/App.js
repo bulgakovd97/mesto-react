@@ -65,40 +65,21 @@ function App() {
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
 
-    if (!isLiked) {
-      api
-        .putLike(card._id)
-        .then((newCard) => {
-          setCards((state) =>
-            state.map((c) => (c._id === card._id ? newCard : c))
-          );
-        })
-        .catch((err) => console.log("Ошибка постановки лайка - " + err));
-    } else {
-      api
-        .deleteLike(card._id)
-        .then((newCard) => {
-          setCards((state) =>
-            state.map((c) => (c._id === card._id ? newCard : c))
-          );
-        })
-        .catch((err) => console.log("Ошибка постановки дизлайка - " + err));
-    }
+    api
+      .changeLikeCardStatus(card._id, isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((err) => console.log("Ошибка постановки лайка/дизлайка - " + err));
   }
 
   function handleCardDelete(id) {
     api
       .removeCard(id)
       .then(() => {
-        const newCards = cards.filter((card) => {
-          if (id === card._id) {
-            return false;
-          }
-
-          return true;
-        });
-
-        setCards(newCards);
+        setCards((cardsData) => cardsData.filter((card) => id !== card._id));
       })
       .catch((err) => console.log("Ошибка удаления карточки - " + err));
   }
@@ -159,19 +140,19 @@ function App() {
             <Footer />
 
             <EditProfilePopup
-              isOpen={isEditProfilePopupOpen && "popup_opened"}
+              isOpen={isEditProfilePopupOpen}
               onClose={closeAllPopups}
               onUpdateUser={handleUpdateUser}
             />
 
             <AddPlacePopup
-              isOpen={isAddPlacePopupOpen && "popup_opened"}
+              isOpen={isAddPlacePopupOpen}
               onClose={closeAllPopups}
               onAddPlace={handleAddPlaceSubmit}
             />
 
             <EditAvatarPopup
-              isOpen={isEditAvatarPopupOpen && "popup_opened"}
+              isOpen={isEditAvatarPopupOpen}
               onClose={closeAllPopups}
               onUpdateAvatar={handleUpdateAvatar}
             />

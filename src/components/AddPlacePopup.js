@@ -19,8 +19,11 @@ function AddPlacePopup(props) {
 
     props.onAddPlace({
       name: title,
-      link,
+      link: link,
     });
+
+    setTitle("");
+    setLink("");
   }
 
   return (
@@ -38,7 +41,7 @@ function AddPlacePopup(props) {
         id="title-input"
         type="text"
         name="name"
-        defaultValue={title}
+        value={title}
         placeholder="Название"
         required
         minLength="2"
@@ -51,7 +54,7 @@ function AddPlacePopup(props) {
         id="url-input"
         type="url"
         name="link"
-        defaultValue={link}
+        value={link}
         placeholder="Ссылка на картинку"
         required
         onChange={handleLinkInputChange}

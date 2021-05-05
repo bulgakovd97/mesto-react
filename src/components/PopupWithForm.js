@@ -1,7 +1,9 @@
 function PopupWithForm(props) {
   return (
     <section
-      className={`popup popup_type_${props.name} ${props.isOpen}`}
+      className={`popup popup_type_${props.name} ${
+        props.isOpen ? "popup_opened" : ""
+      }`}
       aria-label={props.label}
     >
       <div className="popup__container">

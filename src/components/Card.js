@@ -10,15 +10,15 @@ function Card(props) {
 
   const isOwn = props.card.owner._id === currentUser._id;
 
-  const cardDeleteButtonClassName = (
-    `card__delete-button ${isOwn ? `card__delete-button_visible` : ``}`
-  );
+  const cardDeleteButtonClassName = `card__delete-button ${
+    isOwn ? `card__delete-button_visible` : ``
+  }`;
 
-  const isLiked = props.card.likes.some(i => i._id === currentUser._id);
+  const isLiked = props.card.likes.some((i) => i._id === currentUser._id);
 
-  const cardLikeButtonClassName = (
-    `card__like-button ${isLiked ? `card__like-button_active` : ``}`
-  );
+  const cardLikeButtonClassName = `card__like-button ${
+    isLiked ? `card__like-button_active` : ``
+  }`;
 
   function handleLikeClick() {
     props.onCardLike(props.card);
@@ -32,8 +32,8 @@ function Card(props) {
     <li className="card">
       <img
         className="card__image"
-        alt={`${props.card.name}`}
-        src={`${props.card.link}`}
+        alt={props.card.name}
+        src={props.card.link}
         onClick={handleClick}
       />
       <div className="card__caption-field">

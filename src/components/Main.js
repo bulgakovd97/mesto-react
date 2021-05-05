@@ -13,7 +13,7 @@ function Main(props) {
         <div className="profile__avatar-container">
           <img
             className="profile__avatar"
-            alt="Аватар"
+            alt={currentUser.name}
             src={currentUser.avatar}
           />
           <button
