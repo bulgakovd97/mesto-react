@@ -1,36 +1,21 @@
 import React from "react";
-import api from "../utils/api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { CardsContext } from "../contexts/CardsContext";
 import Card from "./Card";
 
 function Main(props) {
-  const [userName, setUserName] = React.useState("");
-
-  const [userDescription, setUserDescription] = React.useState("");
-
-  const [userAvatar, setUserAvatar] = React.useState("");
-
-  const [cards, setCards] = React.useState([]);
-
-  React.useEffect(() => {
-    api
-      .getInitialData()
-      .then((data) => {
-        const [userData, cardsData] = data;
-
-        setUserName(userData.name);
-        setUserDescription(userData.about);
-        setUserAvatar(userData.avatar);
-
-        setCards(cardsData);
-      })
-      .catch((err) => console.log("Ошибка загрузки страницы - " + err));
-  }, []);
+  const currentUser = React.useContext(CurrentUserContext);
+  const cards = React.useContext(CardsContext);
 
   return (
     <main className="content">
       <section className="profile" aria-label="Профиль">
         <div className="profile__avatar-container">
-          <img className="profile__avatar" alt="Аватар" src={userAvatar} />
+          <img
+            className="profile__avatar"
+            alt="Аватар"
+            src={currentUser.avatar}
+          />
           <button
             className="profile__avatar-button"
             type="button"
@@ -39,14 +24,14 @@ function Main(props) {
           ></button>
         </div>
         <div className="profile__info">
-          <h1 className="profile__name">{userName}</h1>
+          <h1 className="profile__name">{currentUser.name}</h1>
           <button
             className="profile__edit-button"
             type="button"
             aria-label="Редактировать"
             onClick={props.onEditProfile}
           ></button>
-          <p className="profile__about">{userDescription}</p>
+          <p className="profile__about">{currentUser.about}</p>
         </div>
         <button
           className="profile__add-button"
@@ -62,6 +47,8 @@ function Main(props) {
             <Card
               card={card}
               onCardClick={props.onCardPreview}
+              onCardLike={props.onCardLike}
+              onCardDelete={props.onCardDelete}
               key={card._id}
             />
           ))}
