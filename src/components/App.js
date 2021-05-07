@@ -9,6 +9,7 @@ import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CardsContext } from "../contexts/CardsContext";
 import AddPlacePopup from "./AddPlacePopup";
+import DeleteCardPopup from "./DeleteCardPopup";
 
 function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
@@ -21,7 +22,13 @@ function App() {
     false
   );
 
+  const [isDeleteCardPopupOpen, setIsDeleteCardPopupOpen] = React.useState(
+    false
+  );
+
   const [selectedCard, setSelectedCard] = React.useState(null);
+
+  const [deletedCard, setDeletedCard] = React.useState(null);
 
   const [currentUser, setCurrentUser] = React.useState({});
 
@@ -55,11 +62,51 @@ function App() {
     setSelectedCard(card);
   }
 
+  function handleCardDeleteClick(card) {
+    setIsDeleteCardPopupOpen(true);
+
+    setDeletedCard(card);
+  }
+
   function closeAllPopups() {
     setIsAddPlacePopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsDeleteCardPopupOpen(false);
     setSelectedCard(null);
+    setDeletedCard(null);
+  }
+
+  React.useEffect(() => {
+    document.addEventListener("keyup", handleEscUp);
+    document.addEventListener("click", handleOverlayClick);
+
+    return () => {
+      document.removeEventListener("keyup", handleEscUp);
+      document.removeEventListener("click", handleOverlayClick);
+    };
+  }, []);
+
+  function handleEscUp(evt) {
+    if (evt.key === "Escape") {
+      setIsAddPlacePopupOpen(false);
+      setIsEditProfilePopupOpen(false);
+      setIsEditAvatarPopupOpen(false);
+      setIsDeleteCardPopupOpen(false);
+      setSelectedCard(null);
+      setDeletedCard(null);
+    }
+  }
+
+  function handleOverlayClick(evt) {
+    if (evt.target.classList.contains("popup_opened")) {
+      setIsAddPlacePopupOpen(false);
+      setIsEditProfilePopupOpen(false);
+      setIsEditAvatarPopupOpen(false);
+      setIsDeleteCardPopupOpen(false);
+      setSelectedCard(null);
+      setDeletedCard(null);
+    }
   }
 
   function handleCardLike(card) {
@@ -73,15 +120,6 @@ function App() {
         );
       })
       .catch((err) => console.log("Ошибка постановки лайка/дизлайка - " + err));
-  }
-
-  function handleCardDelete(id) {
-    api
-      .removeCard(id)
-      .then(() => {
-        setCards((cardsData) => cardsData.filter((card) => id !== card._id));
-      })
-      .catch((err) => console.log("Ошибка удаления карточки - " + err));
   }
 
   function handleUpdateUser({ name, about }) {
@@ -121,6 +159,17 @@ function App() {
       .catch((err) => console.log("Ошибка добавления новой карточки - " + err));
   }
 
+  function handleDeleteCardSubmit(id) {
+    api
+      .removeCard(id)
+      .then(() => {
+        setCards((cardsData) => cardsData.filter((card) => id !== card._id));
+
+        closeAllPopups();
+      })
+      .catch((err) => console.log("Ошибка удаления карточки - " + err));
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <CardsContext.Provider value={cards}>
@@ -134,7 +183,7 @@ function App() {
               onAddPlace={handleAddPlaceClick}
               onCardPreview={handleCardClick}
               onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
+              onCardDelete={handleCardDeleteClick}
             />
 
             <Footer />
@@ -157,13 +206,12 @@ function App() {
               onUpdateAvatar={handleUpdateAvatar}
             />
 
-            {/* <PopupWithForm
-              name="confirm"
-              title="Вы уверены?"
-              buttonText="Да"
-              label="Попап подтверждения удаления карточки"
+            <DeleteCardPopup
+              card={deletedCard}
+              isOpen={isDeleteCardPopupOpen}
               onClose={closeAllPopups}
-            /> */}
+              onCardDelete={handleDeleteCardSubmit}
+            />
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
           </div>
